@@ -68,49 +68,51 @@ systemctl enable ${serviceName}
 systemctl start  ${serviceName}
 
 if systemctl is-active ${serviceName} &>/dev/null ;then
-	echo -e "[${green}成功${plain}] 安装成功！"
+    echo -e "[${green}成功${plain}] 安装成功！"
     echo -e "你的WEB页面地址（IP）   ：${green} https://$(get_ip):11113 ${plain}"
     echo -e "你的默认后端端口为      ：${green} 11112 ${plain}"
     echo -e "你的默认用户名为        ：${green} admin ${plain}"
     echo -e "你的默认密码为          ：${green} 1122345 ${plain}"
     echo -e "注意                    ：${yellow} 如果防火墙打开着，请关闭或添加端口访问权限 ${plain}"
 else
-	echo -e "[${red}错误${plain}] ${SERVCIE_NAME} 启动失败"
+    echo -e "[${red}错误${plain}] ${SERVCIE_NAME} 启动失败"
 fi
 }
 
 install_allminer() {
     check_os
     case $os in
-    	'ubuntu'|'debian')
-	    	apt-get -y update
-	    	apt-get -y install wget
-	    	;;
-		'centos')
-		    yum install -y wget
-		    ;;
+        'ubuntu'|'debian')
+            apt-get -y update
+            apt-get -y install wget
+            ;;
+        'centos')
+            yum install -y wget
+            ;;
     esac
-	if [ -x ${updatePath} ]; then
-	  rm -rf ${updatePath}
-	fi
-	mkdir -p ${updatePath}
+
+    if [ -x ${updatePath} ]; then
+        rm -rf ${updatePath}
+    fi
+    mkdir -p ${updatePath}
 
     cd ${updatePath}
-	wget --no-check-certificate https://raw.githubusercontent.com/Allminer/minerProxy/master/allminer
-	if [ $? -ne 0 ]; then
-		exit -1;
-	fi
-	chmod +x allminer
-	wget --no-check-certificate https://raw.githubusercontent.com/Allminer/minerProxy/master/version
-		if [ $? -ne 0 ]; then
-		exit -1;
-	fi
+    wget --no-check-certificate https://raw.githubusercontent.com/Allminer/minerProxy/master/allminer
+    if [ $? -ne 0 ]; then
+        exit -1;
+    fi
+    chmod +x allminer
+    
+    wget --no-check-certificate https://raw.githubusercontent.com/Allminer/minerProxy/master/version
+        if [ $? -ne 0 ]; then
+        exit -1;
+    fi
 
-	if [ -f "${installPath}/allminer.bak" ]; then
+    if [ -f "${installPath}/allminer.bak" ]; then
         rm -rf "${installPath}/allminer.bak"
         rm -rf "${installPath}/version.bak"
     fi
-	if [ -f "${installPath}/allminer" ]; then
+    if [ -f "${installPath}/allminer" ]; then
         mv "${installPath}/allminer" "${installPath}/allminer.bak"
         mv "${installPath}/version" "${installPath}/version.bak"
     fi
@@ -122,42 +124,43 @@ install_allminer() {
 }
 
 update_allminer() {
-	if [ -x ${updatePath} ]; then
-	  rm -rf ${updatePath}
-	fi
-	mkdir -p ${updatePath}
-	
+    if [ -x ${updatePath} ]; then
+        rm -rf ${updatePath}
+    fi
+
+    mkdir -p ${updatePath}
+
     cd ${updatePath}
-   	wget --no-check-certificate https://raw.githubusercontent.com/Allminer/minerProxy/master/version
-	if [ $? -ne 0 ]; then
-		exit -1;
-	fi
+       wget --no-check-certificate https://raw.githubusercontent.com/Allminer/minerProxy/master/version
+    if [ $? -ne 0 ]; then
+        exit -1;
+    fi
 
-	newVersion=$(cat ${updatePath}/version)
-	oldVerion=$(cat ${installPath}/version)
-	if [ "${newVersion}" == "${oldVerion}" ]; then
-		echo -e "[${green}提示${plain}] 已经是最新版本了，不需要升级"
-		exit 0
-	fi
+    newVersion=$(cat ${updatePath}/version)
+    oldVerion=$(cat ${installPath}/version)
+    if [ "${newVersion}" == "${oldVerion}" ]; then
+        echo -e "[${green}提示${plain}] 已经是最新版本了，不需要升级"
+        exit 0
+    fi
 
-	install_allminer
+    install_allminer
 }
 
 uninstall_allminer() {
     systemctl stop ${serviceName}
-	systemctl disable ${serviceName}
-	rm -rf /lib/systemd/system/${serviceName}.service
-	rm -rf /etc/rsyslog.d/${serviceName}.conf
-	rm -rf /usr/lib/systemd/system/${serviceName}.service
-	systemctl restart rsyslog > /dev/null 2>&1 &
-	systemctl daemon-reload
-	rm -rf ${installPath}
+    systemctl disable ${serviceName}
+    rm -rf /lib/systemd/system/${serviceName}.service
+    rm -rf /etc/rsyslog.d/${serviceName}.conf
+    rm -rf /usr/lib/systemd/system/${serviceName}.service
+    systemctl restart rsyslog > /dev/null 2>&1 &
+    systemctl daemon-reload
+    rm -rf ${installPath}
 }
 
 
 if [ "$EUID" -ne 0 ]; then
-	echo -e "[${red}错误${plain}] 必需以root身份运行，请使用sudo命令"
-	exit 1;
+    echo -e "[${red}错误${plain}] 必需以root身份运行，请使用sudo命令"
+    exit 1;
 fi
 
 
@@ -166,29 +169,29 @@ PS3="请输入操作的序号: "
 select op in ${ops[@]}; do
     case ${op} in
     '安装或重新安装服务')
-		install_allminer
+        install_allminer
 
-		exit 0
+        exit 0
     ;;
     '升级服务')
-    	update_allminer
+        update_allminer
 
-    	exit 0
+        exit 0
     ;;
     '检测服务状态')
         systemctl status allminer
         if systemctl is-active ${serviceName} &>/dev/null ;then
-        	echo -e "[${green}提示${plain}] 服务运行中..."
+            echo -e "[${green}提示${plain}] 服务运行中..."
         else
-        	echo -e "[${red}错误${plain}] 服务已停止"
+            echo -e "[${red}错误${plain}] 服务已停止"
         fi
 
         exit 0
     ;;
     '卸载服务')
-		uninstall_allminer
-		echo -e "[${green}提示${plain}] 服务已经卸载完毕"
-		exit 0
+        uninstall_allminer
+        echo -e "[${green}提示${plain}] 服务已经卸载完毕"
+        exit 0
     ;;
     '退出')
         exit 0
