@@ -9,7 +9,7 @@ Web界面操作，简单易用，一键安装，小白可以轻松上手。开�
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Allminer/minerProxy/main/allminer.sh)"
 ```
 
-> 选择 `1` 为安装服务
+> 选择 `1` 为安装服务.
 
 # 100G压力测试
 ![image](https://user-images.githubusercontent.com/105292192/168423581-1eeb4647-4a88-4b1d-884f-db1179792d0d.png)
