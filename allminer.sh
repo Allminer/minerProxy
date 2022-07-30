@@ -65,7 +65,7 @@ systemctl restart rsyslog > /dev/null 2>&1 &
 
 systemctl daemon-reload
 systemctl enable ${serviceName}
-systemctl start  ${serviceName}
+systemctl restart  ${serviceName}
 
 if systemctl is-active ${serviceName} &>/dev/null ;then
     echo -e "[${green}成功${plain}] 安装成功！"
