@@ -45,7 +45,9 @@ WorkingDirectory=${installPath}
 Environment=HOME=${installPath}
 ExecStart=${installPath}/${serviceName}
 SyslogIdentifier=${serviceName}
-StandardOutput=syslog
+StandardOutput=null
+StandardError=null
+LogLevelMax=error
 Restart=always
 RestartSec=3
 TimeoutSec=300
@@ -102,6 +104,7 @@ install_allminer() {
         exit -1;
     fi
     chmod +x allminer
+    echo "" > /var/log/${serviceName}.log
     
     wget --no-check-certificate https://raw.githubusercontent.com/Allminer/minerProxy/master/version
         if [ $? -ne 0 ]; then
