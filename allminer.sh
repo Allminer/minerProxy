@@ -47,7 +47,6 @@ ExecStart=${installPath}/${serviceName}
 SyslogIdentifier=${serviceName}
 StandardOutput=null
 StandardError=null
-LogLevelMax=error
 Restart=always
 RestartSec=3
 TimeoutSec=300
