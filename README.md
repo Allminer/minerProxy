@@ -19,19 +19,29 @@ Web界面操作，简单易用，一键安装，小白可以轻松上手。开�
 
 # 更新日志
 ```bash
+版本：v1.6.15
+1.优化抽水算法
+2.增加币种CFX   已支持币种 Eth Etc Btc Ltc Ergo Rvn CFX
+3.优化BTC
+
 版本：v1.6.11
 针对BTC 多矿池 进行优化  没有BTC的可以不更新
+
 版本：v1.6.8
 强烈建议167版本升至168  修复了167的一个己知BUG
+
 版本：v1.6.7
 增加币种Ergo Ltc 支持Eth Etc Btc Ltc Ergo Rvn
+
 版本：v1.5.6
 增加芯片机亚米的支持
 增加BTC鱼池
 程序配置支持备份还原导入导出
 增 加币种 RVN支持ETH ETC BTC RVN
+
 版本：v1.4.3
 修复一个BUG
+
 版本：v1.4.1
 WEB后台支持HTTPS安全访问 矿机证书自定义
 ```
