@@ -19,6 +19,12 @@ Web界面操作，简单易用，一键安装，小白可以轻松上手。开�
 
 # 更新日志
 ```bash
+最新版本更新v1.6.15  修正版  
+
+1.增加ERGO 2M矿池 鱼池 支持部份矿池跨池抽水
+2.已支持币种 Eth Etc Btc Ltc Ergo Rvn CFX
+3.优化BTC一个空白指针
+
 版本：v1.6.15
 1.优化抽水算法
 2.增加币种CFX   已支持币种 Eth Etc Btc Ltc Ergo Rvn CFX
