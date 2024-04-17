@@ -157,6 +157,71 @@ uninstall_allminer() {
     rm -rf ${installPath}
 }
 
+modify_limit() {
+  changeLimit="n"
+
+  if [[ -f /etc/debian_version ]]; then
+    echo "soft nofile 65535" | sudo tee -a /etc/security/limits.conf
+    echo "hard nofile 65535" | sudo tee -a /etc/security/limits.conf
+    echo "fs.file-max = 100000" | sudo tee -a /etc/sysctl.conf
+    sudo sysctl -p
+
+    if [[ -f /etc/pam.d/common-session ]]; then
+      grep -q '^session.*pam_limits.so$' /etc/pam.d/common-session || sudo sh -c "echo 'session required pam_limits.so' >> /etc/pam.d/common-session"
+    fi
+  fi
+
+  if [[ -f /etc/redhat-release ]]; then
+      echo "* soft nofile 65535" | sudo tee -a /etc/security/limits.conf
+      echo "* hard nofile 65535" | sudo tee -a /etc/security/limits.conf
+      echo "fs.file-max = 100000" | sudo tee -a /etc/sysctl.conf
+      sudo sysctl -p
+  fi
+
+  if [[ "$(uname)" == "Darwin" ]]; then
+      sudo launchctl limit maxfiles 65535 65535
+      sudo sysctl -w kern.maxfiles=100000
+      sudo sysctl -w kern.maxfilesperproc=65535
+  fi
+
+  if [[ -x /bin/systemctl ]]; then
+      echo "DefaultLimitNOFILE=65535" >>/etc/systemd/user.conf
+      echo "DefaultLimitNOFILE=65535" >>/etc/systemd/system.conf
+      systemctl daemon-reexec
+  fi
+
+  if [ $(grep -c "root soft nofile" /etc/security/limits.conf) -eq '0' ]; then
+      echo "root soft nofile 65535" >>/etc/security/limits.conf
+      echo "* soft nofile 65535" >>/etc/security/limits.conf
+      changeLimit="y"
+  fi
+
+  if [ $(grep -c "root hard nofile" /etc/security/limits.conf) -eq '0' ]; then
+      echo "root hard nofile 65535" >>/etc/security/limits.conf
+      echo "* hard nofile 65535" >>/etc/security/limits.conf
+      changeLimit="y"
+  fi
+
+  if [ $(grep -c "DefaultLimitNOFILE=65535" /etc/systemd/user.conf) -eq '0' ]; then
+      echo "DefaultLimitNOFILE=65535" >>/etc/systemd/user.conf
+      changeLimit="y"
+  fi
+
+  if [ $(grep -c "DefaultLimitNOFILE=65535" /etc/systemd/system.conf) -eq '0' ]; then
+      echo "DefaultLimitNOFILE=65535" >>/etc/systemd/system.conf
+      changeLimit="y"
+  fi
+
+  if [[ "$changeLimit" = "y" ]]; then
+      echo "连接数限制已修改, 重启服务器后生效"
+  else
+      echo -n "当前连接数限制: "
+      ulimit -n
+  fi
+
+  echo "修改完成, 重启服务器后生效"
+}
+
 
 if [ "$EUID" -ne 0 ]; then
     echo -e "[${red}错误${plain}] 必需以root身份运行，请使用sudo命令"
@@ -164,7 +229,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 
-ops=( '安装或重新安装服务' '升级服务' '检测服务状态' '卸载服务' '退出' )
+ops=( '安装或重新安装服务' '升级服务' '检测服务状态' '卸载服务' '解除Linux系统连接数限制' '退出' )
 PS3="请输入操作的序号: "
 select op in ${ops[@]}; do
     case ${op} in
@@ -191,6 +256,10 @@ select op in ${ops[@]}; do
     '卸载服务')
         uninstall_allminer
         echo -e "[${green}提示${plain}] 服务已经卸载完毕"
+        exit 0
+    ;;
+    '解除Linux系统连接数限制')
+        modify_limit
         exit 0
     ;;
     '退出')
